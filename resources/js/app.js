@@ -4,19 +4,26 @@ import vuetify from "./vuetify";
 import Vue3Toastify from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import '@mdi/font/css/materialdesignicons.css';
-
-// Vue App Instances
-const app = createApp({});
-const user = createApp({});
+import 'cropperjs/dist/cropper.css';
 
 // Components Import
 import ExampleComponent from './components/ExampleComponent.vue';
-import User from './components/User.vue';
+import User from './components/user.vue';
+import Dashboard from './components/dashboard/index.vue';
+import imageUpload from './components/img.vue';
 
-// Registering Components
+// Create Vue App Instance
+const app = createApp({});
+
+// Register Components
 app.component('example-component', ExampleComponent);
-user.component('users', User);
+app.component('user-component', User);
+app.component('dashboard-component', Dashboard);
+app.component('image-upload', imageUpload);
 
-// Using Plugins and Mounting
-app.use(vuetify).mount("#app");
-user.use(vuetify).use(Vue3Toastify).mount("#userData");
+// Use Plugins
+app.use(vuetify);
+app.use(Vue3Toastify);
+
+// Mounting App
+app.mount("#app");

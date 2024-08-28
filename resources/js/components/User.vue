@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-btn color="primary" @click="addUserFrom">
+
+    <v-btn color="primary" @click="addUserFrom" class="ml-4 " >
       <v-icon left>mdi-plus</v-icon>
       Add
     </v-btn>
@@ -13,17 +13,21 @@
       </template>
 
       <v-data-table :headers="headers" :items="desserts" :search="search">
-        <template v-slot:item.action="{ item }">
-          <v-btn icon @click="editItem(item)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon @click="deleteItem(item)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
-      </v-data-table>
+    <template v-slot:item.profile="{ item }">
+      <v-img :src="`${item.profile}`" max-height="60" max-width="80" contain class="rounded-xl"></v-img>
+    </template>
+    <template v-slot:item.action="{ item }">
+      <v-btn icon @click="editItem(item)">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn icon @click="deleteItem(item)">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </template>
+  </v-data-table>
+
     </v-card>
-  </v-container>
+
 
   <div class="text-center pa-4">
     <v-dialog v-model="dialog" max-width="600" persistent>
@@ -33,8 +37,19 @@
         </v-card-title>
 
         <v-card-text>
+          <v-img :src="showData.profile" max-height="60" max-width="80" contain class="rounded-xl"></v-img>
           <v-sheet class="mx-auto" max-width="500">
-            <v-form @submit.prevent="btnValue === 'Save' ? saveForm() : updateForm()">
+            <v-form @submit.prevent="btnValue === 'Save' ? saveForm() : updateForm()" >
+   
+              <v-file-input 
+              label="File input" 
+              v-model="showData.profile" 
+              outlined 
+              dense  
+              prepend-icon="mdi-camera" 
+              @change="selectProfile"
+            ></v-file-input>
+
               <v-text-field v-model="showData.name" :rules="firstNameRules" label="Full Name" outlined
                 dense></v-text-field>
               <v-text-field v-model="showData.email" :rules="emailAddressRules" label="Email Address" outlined
@@ -64,22 +79,25 @@ export default {
     return {
       search: '',
       dialog: false,
-
+      profile:null,
       headers: [
-        { align: 'start', key: 'name', sortable: false, title: 'Name' },
+        { align: 'start', key: 'profile', sortable: false, title: 'Profile' },
+        { key: 'name', title: 'Name' },
         { key: 'email', title: 'Email' },
         { key: 'phone', title: 'Phone No.' },
         { key: 'action', title: 'Action' },
-      ],
+      ],  
       desserts: [],
       frontName: [],
       userId: null,
       btnValue: 'Save',
       formTitle: 'Add User',
+      
       showData: {
         name: null,
         email: null,
-        phone: null
+        phone: null,
+        profile:null
       },
 
       firstNameRules: [
@@ -115,73 +133,53 @@ export default {
         console.error('Error fetching data:', error);
       }
     },
-
-
-
+    
     validateForm() {
       const nameValid = this.firstNameRules.every(rule => rule(this.showData.name) === true);
       const emailValid = this.emailAddressRules.every(rule => rule(this.showData.email) === true);
       const phoneValid = this.phoneNumberRules.every(rule => rule(this.showData.phone) === true);
-
       return nameValid && emailValid && phoneValid;
     },
 
-
+    selectProfile(e){
+      console.log('first' ,e.target.files[0]);
+    },
 
 
     saveForm() {
-      if (!this.validateForm()) {
-        console.log(this.validateForm())
-        return;
+    if (!this.validateForm()) {
+      console.log(this.validateForm());
+      return;
+  }
+
+  const saveData = new FormData(); 
+  saveData.append('name', this.showData.name);
+  saveData.append('email', this.showData.email);
+  saveData.append('phone', this.showData.phone);
+  
+  if (this.showData.profile) {
+    saveData.append('profile', this.showData.profile);
+  }
+
+  console.log('Saving', saveData);
+
+  axios.post('http://127.0.0.1:8000/api/store/user', saveData, {
+      headers: {
+        'Content-Type': 'multipart/form-data' 
       }
-
-      const saveData = {
-        name: this.showData.name,
-        email: this.showData.email,
-        phone: this.showData.phone
-      };
-
-      console.log('Saving', saveData);
-
-      axios.post('http://127.0.0.1:8000/api/store/user', saveData)
-        .then(response => {
-          toast.success('Data saved successfully!', {
-            autoClose: 2000
-          });
-          setTimeout(() => {
-            location.reload();
-          }, 2000);
-
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    },
-
-
-
-    updateForm() {
-      if (!this.validateForm()) {
-        return;
-      }
-
-      const updatedData = {
-        name: this.showData.name,
-        email: this.showData.email,
-        phone: this.showData.phone
-      };
-
-      axios.post(`http://127.0.0.1:8000/api/update/user/${this.userData.id}`, updatedData)
-        .then(response => {
-          this.dialog = false;
-          location.reload();
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    },
-
-
+    })
+    .then(response => {
+      this.closeDialog();
+      this.getData();
+      toast.success('Data saved successfully!', {
+        autoClose: 2000,
+        theme: 'dark'
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+},
 
     editItem(item) {
       this.dialog = true;
@@ -191,40 +189,69 @@ export default {
       this.showData.name = item.name;
       this.showData.email = item.email;
       this.showData.phone = item.phone;
+      this.showData.profile = item.profile;
     },
 
+    updateForm() {
+      if (!this.validateForm()) {
+        return;
+      }
 
+      const updatedData = new FormData();
+      updatedData.append('name',this.showData.name);
+      updatedData.append('email',this.showData.email);
+      updatedData.append('phone',this.showData.phone);
+      
+      if (this.showData.profile) {
+        updatedData.append('profile', this.showData.profile);
+  }
+
+
+
+    if ( this.userData.name === updatedData.name &&
+        this.userData.email === updatedData.email &&
+        this.userData.profile === updatedData.profile &&
+        this.userData.phone === updatedData.phone) {
+        return false;
+    }
+
+      axios.post(`http://127.0.0.1:8000/api/update/user/${this.userData.id}`, updatedData)
+        .then(response => {
+          this.closeDialog();
+          this.getData();
+          toast.success('Record update successfully!', {
+              autoClose: 2000,
+              theme:'dark'
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    },
 
     addUserFrom() {
+      console.log(this.showData.name)
       this.dialog = true;
       this.btnValue = "Save";
       this.formTitle = "Add user";
       this.showData = {
         name: null,
         email: null,
-        phone: null
+        phone: null,
+        profile: null
       };
     },
-
 
     deleteItem(item) {
       if (confirm('Are you sure you want to delete this item?')) {
         axios.delete(`http://127.0.0.1:8000/api/delete/user/${item.id}`)
           .then(response => {
-
-
-            this.dialog = false;
-
+            this.closeDialog();
             toast.success('Record delete successfully!', {
               autoClose: 2000,
               theme:'dark'
             });
-
-
-            setTimeout(() => {
-              location.reload();
-            }, 2000);
-
+            this.getData();
           })
           .catch(error => {
             console.error('Error:', error);
@@ -232,7 +259,6 @@ export default {
           });
       }
     },
-
 
     closeDialog() {
       this.dialog = false;
