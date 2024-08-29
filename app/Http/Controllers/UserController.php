@@ -44,14 +44,15 @@ class UserController extends Controller
 
     public function Store(Request $request)
     {    
-
         $user = new User();
+        
         if ($request->hasFile('profile')) {
             $image = $request->file('profile');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/products'), $imageName);
-            $user->profile ='images/products/'. $imageName;
+            $user->profile = 'images/products/' . $imageName;
         }
+    
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->phone = $request->input('phone');
@@ -60,6 +61,8 @@ class UserController extends Controller
     
         return response()->json(['message' => 'User created successfully']);
     }
+    
+    
 
     public function Dashboard()
     {

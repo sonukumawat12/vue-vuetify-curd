@@ -57,7 +57,7 @@
           const reader = new FileReader()
           reader.onload = (e) => {
             this.imageSrc = e.target.result
-            this.originalImageSrc = e.target.result  // Store the original image source
+            this.originalImageSrc = e.target.result 
           }
           reader.readAsDataURL(file)
         }
@@ -66,14 +66,7 @@
         if (this.cropper) {
           const croppedCanvas = this.cropper.getCroppedCanvas()
           this.croppedImage = croppedCanvas.toDataURL()
-          this.imageSrc = this.croppedImage  // Replace imageSrc with cropped image
-        }
-      },
-      uploadImage() {
-        if (this.croppedImage) {
-          // Implement your upload logic here
-          console.log('Cropped Image Data URL:', this.croppedImage)
-          // Example: send this.croppedImage to your server
+          this.imageSrc = this.croppedImage  
         }
       },
       resetImage() {
@@ -81,7 +74,14 @@
         if (this.originalImageSrc) {
           this.imageSrc = this.originalImageSrc
         }
-      }
+      },
+      uploadImage() {
+        if (this.croppedImage) {
+       
+          console.log('Cropped Image Data URL:', this.croppedImage)
+  
+        }
+      },
     }
   }
   </script>
@@ -89,7 +89,7 @@
   <style scoped>
   .crop-container {
     position: relative;
-    width: 300px; /* Adjust width as needed */
+    width: 100; /* Adjust width as needed */
     height: 300px; /* Adjust height as needed */
     overflow: hidden;
     margin-bottom: 16px;

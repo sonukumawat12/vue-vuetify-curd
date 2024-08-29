@@ -39,7 +39,7 @@
 
   <script>
 import { components } from 'vuetify/dist/vuetify-labs.js';
-import User from '../User.vue';
+import User from '../user.vue';
 export default{
     components:{
         User

@@ -11,7 +11,7 @@
 
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
     <div id="dash">
-        <dashboard></dashboard>
+        <dashboard-component></dashboard-component>
 
     </div>
     

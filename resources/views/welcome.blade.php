@@ -10,11 +10,13 @@
 </head>
 
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
-    <div id="app">
-        <example-component></example-component>
-        <user-component></user-component>
-        <image-upload></image-upload>
-    </div>
+   <div class="main">
+        <div id="app">
+            <example-component></example-component>
+            <user-component></user-component>
+        
+        </div>
+   </div>
 </body>
 
 </html>
