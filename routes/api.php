@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::get('get/users',[UserController::class,'getUsers']);
+Route::get('get/users/{status}',[UserController::class,'getData_by_Status']);
+Route::get('get/users-by-date/{date}',[UserController::class,'getData_by_Date']);
 Route::post('update/user/{id}',[UserController::class,'updateUser']);
 Route::post('/store/user',[UserController::class,'Store']);
 Route::delete('delete/user/{id}',[UserController::class,'Destroy']);
